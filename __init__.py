@@ -1,4 +1,4 @@
-class SimpleDataFrame:
+class MinDF:
     def __init__(self, **kwargs):
         # Verify all vectors have the same length
         lengths = {len(v) for v in kwargs.values()}
@@ -34,7 +34,7 @@ class SimpleDataFrame:
 
     @classmethod
     def from_csv(cls, filename):
-        """Read a CSV file into a SimpleDataFrame."""
+        """Read a CSV file into a MinDF."""
         with open(filename, 'r') as f:
             # Read header
             header = next(f).strip().split(',')
@@ -60,7 +60,7 @@ class SimpleDataFrame:
 # Example usage:
 if __name__ == "__main__":
     # Create a data frame
-    df = SimpleDataFrame(
+    df = MinDF(
         name=['Alice', 'Bob', 'Charlie'],
         age=[25, 30, 35],
         score=[92.5, 88.0, 95.5]
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     df.to_csv('data.csv')
     
     # Read from CSV
-    df2 = SimpleDataFrame.from_csv('data.csv')
+    df2 = MinDF.from_csv('data.csv')
     
     # Access data
     print("Names:", df['name'])
