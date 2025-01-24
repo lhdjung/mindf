@@ -25,7 +25,23 @@ class MinDF:
         self._length = lengths.pop() if lengths else 0
     
     def __len__(self):
+        raise TypeError(
+            """
+            To avoid confusion, len() is not implemented for class MinDF.
+            Use one of these instead:
+            df.count_rows()
+            df.count_columns()
+            """
+        )
+    
+    def count_rows(self):
         return self._length
+    
+    def count_columns(self):
+        return len(self.data)
+    
+    def keys(self):
+        return self.data.keys()
     
     def __getitem__(self, key):
         if isinstance(key, str):
@@ -44,7 +60,7 @@ class MinDF:
             f.write(','.join(self.data.keys()) + '\n')
             
             # Write rows
-            for i in range(len(self)):
+            for i in range(self._length):
                 row = [str(self.data[col][i]) for col in self.data.keys()]
                 f.write(','.join(row) + '\n')
     
@@ -82,7 +98,19 @@ if __name__ == "__main__":
         score=[92.5, 88.0, 95.5, 65.0]
     )
 
-    print(f"Length of 'df': {len(df)}")
+    print(dict(df))
+
+    keys_from_dict = dict(df).keys()
+    print(keys_from_dict)
+    
+    for key in keys_from_dict:
+        print(key)
+
+    # print(f"Length of 'df': {len(df)}")
+    print(f"Keys: {df.keys()}")
+
+    print(f"Number of columns: {df.count_columns()}")
+    print(f"Number of rows   : {df.count_rows()}")
 
     for index, item in enumerate(df):
         print(f"{index}: {item}")
