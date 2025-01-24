@@ -1,10 +1,26 @@
 class MinDF:
     def __init__(self, **kwargs):
-        # Verify all vectors have the same length
+        # Verify all items have the same length
+        if not kwargs:
+            self.data = {}
+            self._length = 0
+            return
+
+        # Get the length of the first item (and its key)
+        first_key = next(iter(kwargs.keys()))
+        expected_length = len(kwargs[first_key])
+
+        # Check all other items -- the length must be
+        # the same for all of them
+        for key, item in kwargs.items():
+            if len(item) != expected_length:
+                raise ValueError(
+                    f"Length mismatch -- '{first_key}' has length {expected_length}, "
+                    f"but '{key}' has length {len(item)}"
+                )
+
         lengths = {len(v) for v in kwargs.values()}
-        if len(lengths) > 1:
-            raise ValueError("All vectors must have the same length")
-        
+
         self.data = kwargs
         self._length = lengths.pop() if lengths else 0
     
@@ -31,7 +47,7 @@ class MinDF:
             for i in range(len(self)):
                 row = [str(self.data[col][i]) for col in self.data.keys()]
                 f.write(','.join(row) + '\n')
-
+    
     @classmethod
     def from_csv(cls, filename):
         """Read a CSV file into a MinDF."""
@@ -61,11 +77,16 @@ class MinDF:
 if __name__ == "__main__":
     # Create a data frame
     df = MinDF(
-        name=['Alice', 'Bob', 'Charlie'],
-        age=[25, 30, 35],
-        score=[92.5, 88.0, 95.5]
+        name=['Alice', 'Bob', 'Charlie', 'David'],
+        age=[25, 30, 35, 42],
+        score=[92.5, 88.0, 95.5, 65.0]
     )
-    
+
+    print(f"Length of 'df': {len(df)}")
+
+    for index, item in enumerate(df):
+        print(f"{index}: {item}")
+        
     # Save to CSV
     df.to_csv('data.csv')
     
