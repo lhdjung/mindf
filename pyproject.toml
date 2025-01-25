@@ -1,7 +1,7 @@
 [project]
 name = "mindf"
 version = "0.1.0"
-description = "Add your description here"
+description = "Minimalist data frames"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.8"
 dependencies = []
