@@ -30,14 +30,14 @@ class MinDF:
             To avoid confusion, len() is not implemented for class MinDF.
             Use one of these instead:
             df.count_rows()
-            df.count_columns()
+            df.count_cols()
             """
         )
     
     def count_rows(self):
         return self._length
     
-    def count_columns(self):
+    def count_cols(self):
         return len(self.data)
     
     def keys(self):
@@ -45,11 +45,11 @@ class MinDF:
     
     def col(self, colname):
         if colname not in self.data.keys():
-            raise ValueError(f"not a column name: '{colname}'")
+            raise ValueError(f"'{colname}' is not a column name")
         return self.data.get(colname)
     
     def row(self, index):
-        if abs(index) > self._length:
+        if abs(index) >= self._length:
             raise ValueError(f"index {index} is out of range; number of rows is {self._length}")
         return {col: values[index] for col, values in self.data.items()}
     
@@ -111,7 +111,8 @@ if __name__ == "__main__":
 
     print(dict(df))
     print(f"Using .col(\"age\"): {df.col("age")}")
-    print(f"Using .row(-2): {df.row(-2)}")
+    index = 3
+    print(f"Using .row({index}): {df.row(index)}")
 
     keys_from_dict = dict(df).keys()
     print(keys_from_dict)
@@ -122,8 +123,11 @@ if __name__ == "__main__":
     # print(f"Length of 'df': {len(df)}")
     print(f"Keys: {df.keys()}")
 
-    print(f"Number of columns: {df.count_columns()}")
+    print(f"Number of columns: {df.count_cols()}")
     print(f"Number of rows   : {df.count_rows()}")
+
+    key = "name"
+    print(f"Using df[{key}]: {df[key]}")
 
     print("Now, the for loop:")
 
