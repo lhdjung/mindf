@@ -43,11 +43,22 @@ class MinDF:
     def keys(self):
         return self.data.keys()
     
+    def col(self, colname):
+        if colname not in self.data.keys():
+            raise ValueError(f"not a column name: '{colname}'")
+        return self.data.get(colname)
+    
+    def row(self, index):
+        if abs(index) > self._length:
+            raise ValueError(f"index {index} is out of range; number of rows is {self._length}")
+        return {col: values[index] for col, values in self.data.items()}
+    
     def __getitem__(self, key):
         if isinstance(key, str):
             return self.data[key]
         elif isinstance(key, int):
-            return {col: values[key] for col, values in self.data.items()}
+            return self.row(key)
+            # return {col: values[key] for col, values in self.data.items()}
         raise TypeError(f"Invalid key type: {type(key)}")
     
     def to_csv(self, filename):
@@ -99,6 +110,8 @@ if __name__ == "__main__":
     )
 
     print(dict(df))
+    print(f"Using .col(\"age\"): {df.col("age")}")
+    print(f"Using .row(-2): {df.row(-2)}")
 
     keys_from_dict = dict(df).keys()
     print(keys_from_dict)
@@ -112,8 +125,12 @@ if __name__ == "__main__":
     print(f"Number of columns: {df.count_columns()}")
     print(f"Number of rows   : {df.count_rows()}")
 
-    for index, item in enumerate(df):
+    print("Now, the for loop:")
+
+    for index, item in df.data.items():
         print(f"{index}: {item}")
+    
+    print(df.data)
         
     # Save to CSV
     df.to_csv('data.csv')
