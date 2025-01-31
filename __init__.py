@@ -61,6 +61,91 @@ class MinDF:
             # return {col: values[key] for col, values in self.data.items()}
         raise TypeError(f"Invalid key type: {type(key)}")
     
+    # Start of internal helpers for __str__():
+    def _get_column_widths(self):
+        """Calculate the maximum width needed for each column."""
+        widths = {}
+        for col, values in self.data.items():
+            # Width of column name
+            max_width = len(str(col))
+            # Width of longest value
+            for val in values:
+                max_width = max(max_width, len(str(val)))
+            widths[col] = max_width
+        return widths
+    
+    def _format_row(self, values, widths):
+        """Format a single row of data with proper padding."""
+        return "│ " + " │ ".join(
+            str(val).ljust(widths[col]) 
+            for col, val in zip(self.data.keys(), values)
+        ) + " │"
+    
+    def _format_header(self, widths):
+        """Format the header row with column names."""
+        return "│ " + " │ ".join(
+            col.ljust(widths[col]) 
+            for col in self.data.keys()
+        ) + " │"
+    
+    def _format_separator(self, widths, char="─"):
+        """Create a separator line."""
+        parts = []
+        for col in self.data.keys():
+            parts.append(char * widths[col])
+        return f"├─{'─┼─'.join(parts)}─┤"
+    
+    def _format_top_border(self, widths):
+        """Create the top border."""
+        parts = []
+        for col in self.data.keys():
+            parts.append("─" * widths[col])
+        return f"┌─{'─┬─'.join(parts)}─┐"
+    
+    def _format_bottom_border(self, widths):
+        """Create the bottom border."""
+        parts = []
+        for col in self.data.keys():
+            parts.append("─" * widths[col])
+        return f"└─{'─┴─'.join(parts)}─┘"
+
+    # Tabular string display
+    def __str__(self):
+        if not self.data:
+            return "Empty MinDF"
+        
+        # Get maximum width for each column
+        widths = self._get_column_widths()
+        
+        # Build the string representation
+        lines = []
+        
+        # Add top border, header, and separator
+        lines.append(self._format_top_border(widths))
+        lines.append(self._format_header(widths))
+        lines.append(self._format_separator(widths))
+        
+        # Add data rows
+        for i in range(self.count_rows()):
+            values = [self.data[col][i] for col in self.data.keys()]
+            lines.append(self._format_row(values, widths))
+        
+        # Add bottom border
+        lines.append(self._format_bottom_border(widths))
+        
+        return "\n".join(lines)
+    
+    def __repr__(self):
+        if not self.data:
+            return "MinDF()"
+        
+        # Format each column's data
+        parts = []
+        for col, values in self.data.items():
+            parts.append(f"{col}={repr(values)}")
+        
+        return f"MinDF({', '.join(parts)})"
+
     def to_csv(self, filename):
         """Write the data frame to a CSV file."""
         if not self.data:
@@ -71,10 +156,11 @@ class MinDF:
             f.write(','.join(self.data.keys()) + '\n')
             
             # Write rows
-            for i in range(self._length):
+            for i in range(self.count_rows()):
                 row = [str(self.data[col][i]) for col in self.data.keys()]
                 f.write(','.join(row) + '\n')
-    
+
+        
     @classmethod
     def from_csv(cls, filename):
         """Read a CSV file into a MinDF."""
@@ -111,8 +197,9 @@ if __name__ == "__main__":
 
     print(dict(df))
     print(f"Using .col(\"age\"): {df.col("age")}")
-    index = 3
+    index = 1
     print(f"Using .row({index}): {df.row(index)}")
+    print(f"Using [{index}]: {df[index]}")
 
     keys_from_dict = dict(df).keys()
     print(keys_from_dict)
@@ -127,7 +214,8 @@ if __name__ == "__main__":
     print(f"Number of rows   : {df.count_rows()}")
 
     key = "name"
-    print(f"Using df[{key}]: {df[key]}")
+    print(f"Using df[\"{key}\"]: {df[key]}")
+    print(f"Using df[\"age\"]: {df["age"]}")
 
     print("Now, the for loop:")
 
@@ -145,3 +233,8 @@ if __name__ == "__main__":
     # Access data
     print("Names:", df['name'])
     print("First row:", df[0])
+
+    print(df)
+
+    print("\nRepr:")
+    print(repr(df))
