@@ -25,6 +25,7 @@ class MinDF:
         self._length = lengths.pop() if lengths else 0
     
     def __len__(self):
+        """Disallow len() for MinDF"""
         raise TypeError(
             "can't use len() with a MinDF object.\n" +
                 "Use one of these instead:\n" +
@@ -33,25 +34,31 @@ class MinDF:
         )
     
     def count_rows(self):
+        """Count a MinDF's rows"""
         return self._length
     
     def count_cols(self):
+        """Count a MinDF's columns"""
         return len(self.data)
     
     def keys(self):
+        """Get a MinDF's keys (or headers, or column names)"""
         return self.data.keys()
     
     def col(self, colname):
+        """Get a column by name"""
         if colname not in self.data.keys():
             raise ValueError(f"'{colname}' is not a column name")
         return self.data.get(colname)
     
     def row(self, index):
+        """Get a row (dict) by index"""
         if abs(index) >= self._length:
             raise ValueError(f"index {index} is out of range; number of rows is {self._length}")
         return {col: values[index] for col, values in self.data.items()}
     
     def __getitem__(self, key):
+        """Get a column by name or a row by index"""
         if isinstance(key, str):
             return self.data[key]
         elif isinstance(key, int):
@@ -61,7 +68,7 @@ class MinDF:
     
     # Start of internal helpers for __str__():
     def _get_column_widths(self):
-        """Calculate the maximum width needed for each column."""
+        """Calculate the maximum width needed for each column"""
         widths = {}
         for col, values in self.data.items():
             # Width of column name
@@ -73,42 +80,42 @@ class MinDF:
         return widths
     
     def _format_row(self, values, widths):
-        """Format a single row of data with proper padding."""
+        """Format a single row of data with proper padding"""
         return "│ " + " │ ".join(
             str(val).ljust(widths[col]) 
             for col, val in zip(self.data.keys(), values)
         ) + " │"
     
     def _format_header(self, widths):
-        """Format the header row with column names."""
+        """Format the header row with column names"""
         return "│ " + " │ ".join(
             col.ljust(widths[col]) 
             for col in self.data.keys()
         ) + " │"
     
     def _format_separator(self, widths, char="─"):
-        """Create a separator line."""
+        """Create a separator line"""
         parts = []
         for col in self.data.keys():
             parts.append(char * widths[col])
         return f"├─{'─┼─'.join(parts)}─┤"
     
     def _format_top_border(self, widths):
-        """Create the top border."""
+        """Create the top border"""
         parts = []
         for col in self.data.keys():
             parts.append("─" * widths[col])
         return f"┌─{'─┬─'.join(parts)}─┐"
     
     def _format_bottom_border(self, widths):
-        """Create the bottom border."""
+        """Create the bottom border"""
         parts = []
         for col in self.data.keys():
             parts.append("─" * widths[col])
         return f"└─{'─┴─'.join(parts)}─┘"
 
-    # Tabular string display
     def __str__(self):
+        """Tabular string display"""
         if not self.data:
             return "Empty MinDF"
         
@@ -134,6 +141,7 @@ class MinDF:
         return "\n".join(lines)
     
     def __repr__(self):
+        """Print code to reproduce a MinDF"""
         if not self.data:
             return "MinDF()"
         
@@ -145,7 +153,7 @@ class MinDF:
         return f"MinDF({', '.join(parts)})"
 
     def to_csv(self, filename):
-        """Write the data frame to a CSV file."""
+        """Write the MinDF to a CSV file"""
         if not self.data:
             return
         
@@ -161,7 +169,7 @@ class MinDF:
         
     @classmethod
     def from_csv(cls, filename):
-        """Read a CSV file into a MinDF."""
+        """Read a CSV file into a MinDF"""
         with open(filename, 'r') as f:
             # Read header
             header = next(f).strip().split(',')
