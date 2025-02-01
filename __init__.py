@@ -26,12 +26,10 @@ class MinDF:
     
     def __len__(self):
         raise TypeError(
-            """
-            To avoid confusion, len() is not implemented for class MinDF.
-            Use one of these instead:
-            df.count_rows()
-            df.count_cols()
-            """
+            "can't use len() with a MinDF object.\n" +
+                "Use one of these instead:\n" +
+                "   df.count_rows()\n" +
+                "   df.count_cols()"
         )
     
     def count_rows(self):
